@@ -58,7 +58,7 @@ data_err=[]
 total_num_pictures = len(glob.glob1('.',"*.png"))
 frame_number=np.arange(total_num_pictures)
 
-gamma=64 #[N/m]
+gamma=64 #[mN/m] #example Surface tension value (glycerol)
 Cg_air=1/101325 #Pa**(-1)
 k_o=2*np.pi*40/340  #wave number in the air. frequency 40kHz (25kH=0.000040sec) and speed of sound in air v=340 m/s from paper (331.5 for 20oC online) 
 #Calibration
@@ -117,7 +117,7 @@ def calc_R_sph(vol):
 
     """
 #    calibration=0.00621722846441948**3
-    R_sph=(3*vol*calibration/(4*np.pi))**(1/3)
+    R_sph=(3*vol/(4*np.pi))**(1/3)
     return R_sph
 
 def calc_dB(Ps):
@@ -137,6 +137,33 @@ def calc_dB(Ps):
 
     return 20*np.log10(Ps/Po)     #Acoustic pressure [Pa]
 
+
+def azimuth(x, y):
+    """
+    Calculate the azimuthal angle.
+
+    Input parameters
+    ----------
+    x, y: Cartesian coordinates
+    Returns
+    -------
+    Azimuthal angle in rad
+
+    """
+    a=np.arctan2(x, y)
+    return a
+
+
+def cart2pol(x, y):
+    rho = np.sqrt(x**2 + y**2)
+    phi = np.arctan2(y, x)
+    return(rho, phi)
+
+def pol2cart(rho, phi):
+    x = rho * np.cos(phi)
+    y = rho * np.sin(phi)
+    return(x, y)
+
 def model_fit(th, Ps):
     """
     Express the model that will be used to fit the experimental data (simple approach).
@@ -153,6 +180,7 @@ def model_fit(th, Ps):
 #    Ps=calc_ampl(dB)
     ct_new=-((3/(64*gamma))*R_sph**2*Ps**2*Cg_air*(1+((7/5)*(k_o*R_sph)**2)))
     return ct_new*(3*(np.cos(th))**2-1)+R_sph
+#################################################################
 
 def ST_predict(th, gamma):
     """
@@ -172,38 +200,6 @@ def ST_predict(th, gamma):
 #    Ps=data_Ps[i-1]    #[Pa]
     ct_new=-((3/(64*gamma))*R_sph**2*Ps**2*Cg_air*(1+((7/5)*(k_o*R_sph)**2)))
     return ct_new*(3*(np.cos(th))**2-1)+R_sph
-
-
-def azimuth(phi):
-    """
-    Calculate the azimuthal angle.
-
-    Input parameters
-    ----------
-    phi:     angle phi
-
-    Returns
-    -------
-    Azimuthal angle.
-
-    """
-
-    if phi<=np.pi/2:
-        a=np.pi/2-phi
-    else:
-        a=2.5*np.pi-phi
-    return a
-
-
-def cart2pol(x, y):
-    rho = np.sqrt(x**2 + y**2)
-    theta = np.arctan2(y, x)
-    return(theta, rho)
-
-def pol2cart(rho, phi):
-    x = rho * np.cos(phi)
-    y = rho * np.sin(phi)
-    return(x, y)
 
 
 # Print iterations progress
@@ -227,22 +223,24 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
     # Print New Line on Complete
     if iteration == total: 
         print()
+#################################################################################
 
 def extract_coord(filename):
     data_x=[]
     data_y=[]
- 
+    data_xvol=[]
+    data_yvol=[]
     # determine the contour
     im = cv2.imread(filename)
     imgray = cv2.cvtColor(im,cv2.COLOR_BGR2GRAY)
     edged = cv2.Canny(imgray, 100, 200) 
     contours, hierarchy = cv2.findContours(edged,cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE) 
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    cv2.putText(imgray,filename,(40,40), font, .5,(0,0,200),1,cv2.LINE_AA)
-    cv2.imshow('Canny Edges After Contouring', imgray)
-    cv2.waitKey(10) 
+    # font = cv2.FONT_HERSHEY_SIMPLEX
+    # cv2.putText(imgray,filename,(40,40), font, .5,(0,0,200),1,cv2.LINE_AA)
+    #cv2.imshow('Canny Edges After Contouring', imgray)
+    #cv2.waitKey(10) 
     data=contours[0]
- 
+     
     threshold_area=1000
     
     for c in contours:
@@ -254,29 +252,35 @@ def extract_coord(filename):
             (x, y, w, h) = cv2.boundingRect(c)
             #print(area, c[0].shape, h, w, st)
             
-    cv2.drawContours(im, c, -1, (0, 0, 255), 1) 
-    cv2.rectangle(im,(x,y),(x+w,y+h),(255,0,0),2)
-    cv2.imshow('Contours', im) 
-    cv2.waitKey(10) 
+    # cv2.drawContours(im, c, -1, (0, 0, 255), 1) 
+    # cv2.rectangle(im,(x,y),(x+w,y+h),(255,0,0),2)
+   # cv2.imshow('Contours', im) 
+   # cv2.waitKey(10) 
     
     
     for i in data:
-        data_x.append(i[0,0]-(x+w/2))
-        data_y.append(i[0,1]-(y+h/2))
+        data_xvol.append(i[0,0]-(x+w/2))
+        data_yvol.append(i[0,1]-(y+h/2))
+        data_x.append(i[0,0])
+        data_y.append(i[0,1])
     
-    h_box=h
-    w_box=w
+    h_box=h*cal
+    w_box=w*cal
     
-    x=data_x
-    y=data_y
-    x=np.asarray(x)
-    y=np.asarray(y)
-        
-    vol=calc_volume(x,y)
+    
+    xvol=np.asarray(data_xvol)*cal
+    yvol=np.asarray(data_yvol)*cal
+    
+    x=np.asarray(data_x)*cal
+    y=np.asarray(data_y)*cal
+    [rho, phi]=cart2pol(xvol, yvol)
+    # phi=phi+np.pi
+    theta=azimuth(xvol, yvol)
+    vol=calc_volume(xvol, yvol)
     
     R_sph=calc_R_sph(vol)
     
-    return (x, y, vol, h_box, w_box, R_sph)
+    return (x, y, rho, phi, theta, vol, h_box, w_box, R_sph)
 
 def log_interp1d(xx, yy, kind='linear'):            #Used for the ST calculation
     logx = np.log10(xx)
