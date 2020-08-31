@@ -288,3 +288,8 @@ def log_interp1d(xx, yy, kind='linear'):            #Used for the ST calculation
     lin_interp = sp.interpolate.interp1d(logx, logy, kind=kind)
     log_interp = lambda zz: np.power(10.0, lin_interp(np.log10(zz)))
     return log_interp
+
+def find_nearest(array, value):
+    array = np.asarray(array)
+    idx = (np.abs(array - value)).argmin()
+    return array[idx], idx
