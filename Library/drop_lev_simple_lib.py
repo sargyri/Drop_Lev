@@ -65,8 +65,8 @@ k_o=2*np.pi*40/340  #wave number in the air. frequency 40kHz (25kH=0.000040sec) 
 needle_d=0.83 #mm
 needle_pxl=220 #pixels
 #calibration=0.00621722846441948**3
-cal=needle_d/needle_pxl
-calibration=(cal)**3
+cal=needle_d/needle_pxl #[mm/pixels]
+calibration=(cal)**3  #[mm**3/pixels**3]
 
 
 ###############################################################################
@@ -79,7 +79,7 @@ def calc_volume(x,y):
 
     Parameters
     ----------
-    x, y - contour of the drop
+    x, y - cartesian coordinates of contour of the drop [mm]
 
     Returns
     -------
@@ -108,7 +108,7 @@ def calc_R_sph(vol):
 
     Input parameters
     ----------
-    vol:         volume   [pixels**3]
+    vol:         volume   [μL]
     calibration: calibration factor  [mm**3/pixels**3]
 
     Returns
@@ -126,16 +126,16 @@ def calc_dB(Ps):
 
     Input parameters
     ----------
-    Ps:     aplitude of the acoustic pressure
+    Ps:     aplitude of the acoustic pressure [Pa]
 
     Returns
     -------
-    dB value. []
+    dB value. [deci Bell]
 
     """
     Po=2*10**(-5) #[Pa]
 
-    return 20*np.log10(Ps/Po)     #Acoustic pressure [Pa]
+    return 20*np.log10(Ps/Po)     
 
 
 def azimuth(x, y):
@@ -144,10 +144,10 @@ def azimuth(x, y):
 
     Input parameters
     ----------
-    x, y: Cartesian coordinates
+    x, y: Cartesian coordinates of contour of the drop [mm]
     Returns
     -------
-    Azimuthal angle in rad
+    Azimuthal angle in [rad]
 
     """
     a=np.arctan2(x, y)
@@ -155,11 +155,32 @@ def azimuth(x, y):
 
 
 def cart2pol(x, y):
+    """
+    Converts the cartesial coordinates into polar
+
+    Input parameters
+    ----------
+    x, y: Cartesian coordinates of contour of the drop [mm, mm]
+    Returns
+    -------
+    ρ, φ: Polar coordinates [mm, rad]
+
+    """
     rho = np.sqrt(x**2 + y**2)
     phi = np.arctan2(y, x)
     return(rho, phi)
 
 def pol2cart(rho, phi):
+    """
+    Converts the polar coordinates into cartesial
+
+    Input parameters
+    ----------
+    ρ, φ: Polar coordinates [mm, rad]
+    Returns
+    -------
+    x, y: Cartesian coordinates of contour of the drop [mm, mm]
+    """
     x = rho * np.cos(phi)
     y = rho * np.sin(phi)
     return(x, y)
@@ -170,8 +191,14 @@ def model_fit(th, Ps):
 
     Input parameters
     ----------
-    dB:     deciBell
-    th:     angle theta
+    th:     azimuth angle theta [rad]
+    Ps:     Acoustic pressure [Pa]
+    ---------------------------------------
+    gamma:  Surface tension [mN/m]
+    R_sph:  Equivalent spherical radius [mm]
+    Cg_air: Air compressibility (constant) [Pa^-1]
+    k_o:    Wave number in air [1/mm]
+    
     Returns
     -------
     Expression of fitting model.
@@ -189,13 +216,17 @@ def ST_predict(th, gamma):
     
     Input parameters
     ----------
-    th:     angle theta
-    gamma:  ST as initial predition [mN/m]
-    Power:  U*I [Watt]
+    th:     azimuth angle theta [rad]
+    gamma:  Surface tension [mN/m]
+    ---------------------------------------
+    Ps:     Acoustic pressure [Pa]
+    R_sph:  Equivalent spherical radius [mm]
+    Cg_air: Air compressibility (constant) [Pa^-1]
+    k_o:    Wave number in air [1/mm]
+    
     Returns
     -------
-    gamma:   predicted surface tension [mN/m]
-
+    Expression of fitting model.
     """    
 #    Ps=data_Ps[i-1]    #[Pa]
     ct_new=-((3/(64*gamma))*R_sph**2*Ps**2*Cg_air*(1+((7/5)*(k_o*R_sph)**2)))
@@ -226,6 +257,25 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
 #################################################################################
 
 def extract_coord(filename):
+     """
+     This function extracts all the parameters related to the 
+     drop via the cv2 library. 
+     
+     Input parameters:
+     --------
+     filename:   image (reads in [pixels])
+     
+     Output parameters:
+     ------
+     x, y :       Cartesian coordinates [mm, mm]
+     rho, phi:    Polar coordinates [mm, rad]
+     theta:       azimuth angle  [rad]
+     vol:         Volume of drop [μL]
+     h_box:       Height of drop [mm] 
+     w_box:       Width of drop [mm]
+     R_sph:       Equivalent sperical radius [mm]
+     
+     """
     data_x=[]
     data_y=[]
     data_xvol=[]
