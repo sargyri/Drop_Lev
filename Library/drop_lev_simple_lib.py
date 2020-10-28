@@ -312,7 +312,7 @@ def extract_coord(filename):
         data_xvol.append(i[0,0]-(x+w/2))
         data_yvol.append(i[0,1]-(y+h/2))
         data_x.append(i[0,0])
-        data_y.append(i[0,1])
+        data_y.append(-i[0,1])
     
     h_box=h*cal
     w_box=w*cal
