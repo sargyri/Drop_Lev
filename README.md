@@ -12,9 +12,13 @@ x(θ)  = - (3 / 64σ) * (3cos^2(θ) - 1) * R^2 * P_{s}^2 β_0 [ 1 + (7 /5) (kR)^
 Where, θ is the azimuth angle, σ is the surface tension, R is the equivalent spherical radius, P_s is the acoustic pressure on the surface of the droplet, β_0 is the compressibility and k is the wavenumber of the operational frequency (40 kHz).
 
 In the folder ''Data'' you can download the zip folders containing the data used for the training and testing of the neural network. 
+//
+
 In the folder ''Machine learning'' you can find the machine learning algorithms applied on in-silico data and experimental data.
 
 
+
+References:
 
 [1] Trinh, Eugene H., and Chaur‐Jian Hsu. "Equilibrium shapes of acoustically levitated drops." The Journal of the Acoustical Society of America 79.5 (1986): 1335-1338.
 
