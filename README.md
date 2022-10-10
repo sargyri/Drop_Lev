@@ -2,7 +2,7 @@
 
 Welcome to the DropLev project. In this depository you can find the data presented in the publication ''.....'' and the machine learning algorithm that was develeoped for the prediction of surface tension of acoustically leitated droplets. 
 
-The in-silico data were generated from the equations:
+The in-silico data were generated from the equations [1]:
 r(θ) = x(θ) + R
 
 Where,
@@ -15,6 +15,8 @@ In the folder ''Data'' you can download the zip folders containing the data used
 In the folder ''Machine learning'' you can find the machine learning algorithms applied on in-silico data and experimental data.
 
 
+
+[1] Trinh, Eugene H., and Chaur‐Jian Hsu. "Equilibrium shapes of acoustically levitated drops." The Journal of the Acoustical Society of America 79.5 (1986): 1335-1338.
 
 
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------
