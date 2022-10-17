@@ -17,7 +17,11 @@ In the folder ''Machine learning'' you can find the machine learning algorithms 
 References:
 
 [1] P. L. Marston, S. E. Lo Porto Arione, and G. L. Pullen, J. Acoust. Soc. Am. 69, 1499-1501 (1981).
+
+
 [2] P.L . Marston,J . AcoustS. ac.A m. 67, 15-26 (1980).
+
+
 [3] Trinh, Eugene H., and Chaur‐Jian Hsu. "Equilibrium shapes of acoustically levitated drops." The Journal of the Acoustical Society of America 79.5 (1986): 1335-1338.
 
 
