@@ -6,7 +6,7 @@ Welcome to the DropLev project. In this depository you can find the data and mac
 The acoustic levitator that was used for the collection of the experimental data is insprired by TinyLev [1]. A manuscript with the design and its experimental performance is being prepared. 
 
 
-The in-silico data were generated from the theory developed by Marston et al. [1-3]. The equation used for the generation of the theoretical contours can be found in reference 3.
+The in-silico data were generated from the theory developed by Marston et al. [2-4]. The equation used for the generation of the theoretical contours can be found in reference 4.
 
 In the folder ''Data'' you can download the zip folders containing the data used for the training and testing of the neural network. 
 
