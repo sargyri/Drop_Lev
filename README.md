@@ -1,6 +1,6 @@
 # Drop_Lev
 
-Welcome to the DropLev project. In this depository you can find the data and machine learning algorithm that was develeoped for the prediction of surface tension of acoustically leitated droplets in the article: DOI...
+Welcome to the DropLev project. In this depository you can find the data and machine learning algorithm that was develeoped for the prediction of surface tension of acoustically levitated droplets in the article: DOI...
 
 
 The acoustic levitator that was used for the collection of the experimental data is insprired by TinyLev [1]. A manuscript with the design and its experimental performance is being prepared. 
