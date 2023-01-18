@@ -11,13 +11,19 @@ The in-silico data were generated from the theory developed by Marston et al. [2
 In the folder ''Data'' you can download the zip folders containing the data used for the training and testing of the neural network. 
 
 
-In the folder ''Machine learning'' you can find the machine learning algorithms applied on in-silico data and experimental data.
+In the folder ''Machine learning'' you can find the machine learning algorithms applied on in-silico data and experimental data. 
 
-The file ''Trained_neural_netowrk_MAE_088.h5'' contains the best trained neural network we managed to achieve. 
 
-The file ''Training_dataset_for_normaliztion.csv'' containes the dataset that needs to be used to normalize new data on which we want to predict the surface tension.
+In the folder ''Trained_model'' you can find a jupiter notebook where the best trained neural network we manages to achieve is tested with data that the algorithm hasn't been trained on. The files needed to reproduce the plots can be found in the file ''Requirements''.  
 
-The file ''Test_dataset.csv'' is an example of a dataset that the neural network has not been trained on. 
+
+The file ''Trained_NN_MAE_088.h5'' contains the best trained neural network we managed to achieve. 
+
+
+The file ''training_dataset_pre_norm.csv'' containes the pre-normalized dataset that was used for the training. Any new data on which we want to predict the surface tension need to be normalized based on the training dataset.
+
+
+The file ''test_dataset.csv'' is an example of a dataset that the neural network has not been trained on. 
 
 
 To use the trained neural network we need a dataset that will contain, in the following order:  
