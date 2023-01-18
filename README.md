@@ -13,7 +13,7 @@ In the folder ''Data'' you can download the zip folders containing the data used
 
 In the folder ''Machine learning'' you can find the machine learning algorithms applied on in-silico data and experimental data.
 
-The file ''Trained_model_MAE_089.h5'' contains the best trained neural network we managed to achieve. 
+The file ''Trained_neural_netowrk_MAE_088.h5'' contains the best trained neural network we managed to achieve. 
 
 The file ''Training_dataset_for_normaliztion.csv'' containes the dataset that needs to be used to normalize new data on which we want to predict the surface tension.
 
