@@ -30,7 +30,7 @@ To use the trained neural network we need a dataset that will contain, in the fo
 
 
 - 175 points defining the polar radius, r (mm), at constant polar radius, phi defined as:
-phi=np.linspace(-3.14, 3.14, 175)
+phi=np.linspace(-np.pi, np.pi, 175)
 
 
 ** The coordinates of the droplet contours need to be corrected for tilting. **
