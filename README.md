@@ -13,6 +13,31 @@ In the folder ''Data'' you can download the zip folders containing the data used
 
 In the folder ''Machine learning'' you can find the machine learning algorithms applied on in-silico data and experimental data.
 
+The file ''Trained_model_MAE_089.h5'' contains the best trained neural network we managed to achieve. 
+
+The file ''Training_dataset_for_normaliztion.csv'' containes the dataset that needs to be used to normalize new data on which we want to predict the surface tension.
+
+The file ''Test_dataset.csv'' is an example of a dataset that the neural network has not been trained on. 
+
+
+To use the trained neural network we need a dataset that will contain, in the following order:  
+
+
+- 175 points defining the polar radius, r (mm), at constant polar radius, phi defined as:
+phi=np.linspace(-3.14, 3.14, 175)
+
+
+** The coordinates of the droplet contours need to be corrected for tilting. **
+
+
+- centered vertical position of the centre of the droplet (mm)
+
+
+- voltage (V)
+
+
+- current (A)
+
 
 
 
