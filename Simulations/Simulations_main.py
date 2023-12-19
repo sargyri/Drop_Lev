@@ -10,15 +10,15 @@ import os
 import sys
 from importlib import import_module 
 
-path_to_library=str('C:/Users/argyri/Desktop/lev_simul/src/') #For windows
+path_to_library=str('path_to_the_file_coordinates.py') #For windows
 sys.path.insert(0, path_to_library)
 source_coordinates = import_module("coordinates")
 
 
 # ----------------------------------------
 #### Simulation Parameters :
-lev_list = ["LangLev"] #"mk1" or "LangLev"
-phase = "quadrature"             # ''quadrature''  or ''in_phase'' => To have a central node or a central antinode, respectively
+lev_list = ["mk3"] #"mk1" or "LangLev"
+phase = "opposition"             # ''opposition''  or ''in_phase'' => To have the central node or a central antinode at (0,0,0), respectively
 
 #### Saving parameters:
 path_save=str('change_this_to_the_proper_directory_you_want_to_save_the_images_in')
@@ -32,7 +32,7 @@ max_x = 0.012
 max_y = 0.012
 max_z = 0.012       
 
-plots = ["x","y","z","yz","xz","xy"]
+plots = ['x', 'y', 'z', "yz","xz","xy"]
 for levitator in lev_list:
     for i in plots:
         #Define mesh for the 2D plots
@@ -64,10 +64,10 @@ for levitator in lev_list:
     
         #Import coordinates
         if levitator=='LangLev':
-            p0=30     # Reference pressure (Pa) used in levitate
+            p0=10     # Reference pressure (Pa) used in levitate
             coord= source_coordinates.lev(levitator) / 1000
         else:
-            p0=3      # Reference pressure (Pa) used in levitate
+            p0=1      # Reference pressure (Pa) used in levitate
             coord = source_coordinates.lev(levitator) / 1000
 
 
@@ -96,31 +96,43 @@ for levitator in lev_list:
         elif phase == 'in phase':
             phases_up = 0.5*np.pi*np.ones((1,len(coord)//2)) 
         
-        normal = -1*coord / np.linalg.norm(coord, 2, axis=1, keepdims = 1)
+        normals = -1*coord / np.linalg.norm(coord, 2, axis=1, keepdims = 1)
         coord = coord.T
-        normal = normal.T
-
-        phases = np.append(phases_down,phases_up)
-        complex_phase = levitate.utils.complex(phases)
-
-        transducer = levitate.transducers.CircularRing(effective_radius=3e-3, p0=p0)    
-        array = levitate.arrays.TransducerArray(coord, normal, transducer=transducer, transducer_size=0.01)
-        # array.freq=60000
+        normals = normals.T
         
+        
+        transducer = levitate.transducers.CircularRing(effective_radius=3.5e-3, p0=p0)
+        array = levitate.arrays.TransducerArray(coord, normals, transducer=transducer)
+        
+        state = 0.5*np.pi*np.ones(array.num_transducers, complex)
+        
+        top_idx = np.where(coord[2] > 0)
+        bottom_idx = np.where(coord[2] < 0)
+
+        if phase=='opposition':
+          state[top_idx] = 1j
+          state[bottom_idx] = -1j
+        elif phase=='in_phase':
+          state[top_idx] = 1j
+          state[bottom_idx] = 1j
+        
+        array.state = state
+                
+
         
         # ----------------------------------------
         ##### Levitate calculation :
 
         pressure_calculation_instance = levitate.fields.Pressure(array) @ points
-        pressure = abs(pressure_calculation_instance(complex_phase))
+        pressure = abs(pressure_calculation_instance(state))
 
 
         gorkov_calc = levitate.fields.GorkovPotential(array,radius = 1e-3) @ points
         gorkov_grad_calc = levitate.fields.GorkovGradient(array,radius = 1e-3) @ points
         
-        gorkov = gorkov_calc(complex_phase)
+        gorkov = gorkov_calc(state)
         gorkov = gorkov.reshape(len(x),len(y),len(z))
-        gorkov_grad = gorkov_grad_calc(complex_phase)
+        gorkov_grad = gorkov_grad_calc(state)
         F = -gorkov_grad.reshape(3,len(x),len(y),len(z))
         pressure = pressure.reshape(len(x),len(y),len(z))
 
@@ -137,13 +149,13 @@ for levitator in lev_list:
         if i == "yz":
             fig,ax = plt.subplots(figsize = (500*max_x,402*max_z))
 
-            cs = ax.contourf(y*1000,z*1000,pressure[x0,:,:].T,100, vmin = 0, vmax = 1700)
+            cs = ax.contourf(y*1000,z*1000,pressure[x0,:,:].T,100, vmin = 0, vmax = np.amax(pressure[x0,:,:].T))
             for a in cs.collections:
                 a.set_edgecolor('face')
             plt.xlim((-max_y*1000,max_y*1000))
             plt.ylim((-max_z*1000,max_z*1000))
-            plt.xlabel('Y (mm)')
-            plt.ylabel('Z (mm)')
+            plt.xlabel('y (mm)')
+            plt.ylabel('z (mm)')
             plt.axis('equal')
             bar = fig.colorbar(cs)
             plt.title("Theoretical pressure field Y, Z")
@@ -155,13 +167,13 @@ for levitator in lev_list:
         ##### 2d Pressure Map X, Z :
         if i == "xz":
             fig,ax = plt.subplots(figsize = (500*max_x,402*max_z))
-            cs = ax.contourf(x*1000,z*1000,pressure[:,y0,:].T,100, vmin = 0, vmax = 3600)
+            cs = ax.contourf(x*1000,z*1000,pressure[:,y0,:].T,100, vmin = 0, vmax = np.amax(pressure[:,y0,:].T))
             for a in cs.collections:
                 a.set_edgecolor('face')
             plt.xlim((-max_y*1000,max_y*1000))
             plt.ylim((-max_z*1000,max_z*1000))
-            plt.xlabel('X (mm)')
-            plt.ylabel('Z (mm)')
+            plt.xlabel('x (mm)')
+            plt.ylabel('z (mm)')
             plt.axis('equal')
             bar = fig.colorbar(cs)
             plt.title("Theoretical pressure field X, Z")
@@ -171,13 +183,13 @@ for levitator in lev_list:
         ##### 2d Pressure Map X, Y :
         if i == "xy":
             fig,ax = plt.subplots(figsize = (500*max_x,402*max_y))
-            cs = ax.contourf(x*1000,y*1000,pressure[:,:,z0].T,100, vmin = 0, vmax = 37)
+            cs = ax.contourf(x*1000,y*1000,pressure[:,:,z0].T,100, vmin = 0, vmax = np.amax(pressure[:,:,z0].T))
             for a in cs.collections:
                 a.set_edgecolor('face')
             plt.xlim((-max_y*1000,max_y*1000))
             plt.ylim((-max_z*1000,max_z*1000))
-            plt.xlabel('X (mm)')
-            plt.ylabel('Y (mm)')
+            plt.xlabel('x (mm)')
+            plt.ylabel('y (mm)')
             plt.axis('equal')
             bar = fig.colorbar(cs)
             plt.title("Theoretical pressure field X, Y")
@@ -188,11 +200,11 @@ for levitator in lev_list:
         #### 2D Gorkov Potential y,z :
         if i == "yz":
             fig,ax = plt.subplots(figsize = (500*max_y,402*max_z))
-            cs = ax.contourf(y*1000,z*1000,gorkov[x0,:,:].T,100, vmin = -2e-8, vmax = 2e-8)
+            cs = ax.contourf(y*1000,z*1000,gorkov[x0,:,:].T,100, vmin = -2e-8, vmax = np.amax(gorkov[x0,:,:].T))
             for a in cs.collections:
                 a.set_edgecolor('face')
-            plt.xlabel('Y (mm)')
-            plt.ylabel('Z (mm)')
+            plt.xlabel('y (mm)')
+            plt.ylabel('z (mm)')
             plt.axis('equal')
             plt.xlim((-max_y*1000,max_y*1000))
             plt.ylim((-max_z*1000,max_z*1000))
@@ -205,11 +217,11 @@ for levitator in lev_list:
         ##### 2D Gorkov Potential x,z :
         if i == "xz":
             fig,ax = plt.subplots(figsize = (500*max_x,402*max_z))
-            cs = ax.contourf(x*1000,z*1000,gorkov[:,y0,:].T,100, vmin = -2e-8, vmax = 2e-8)
+            cs = ax.contourf(x*1000,z*1000,gorkov[:,y0,:].T,100, vmin = -2e-8, vmax = np.amax(gorkov[:,y0,:].T))
             for a in cs.collections:
                 a.set_edgecolor('face')
-            plt.xlabel('X (mm)')
-            plt.ylabel('Z (mm)')
+            plt.xlabel('x (mm)')
+            plt.ylabel('z (mm)')
             plt.axis('equal')
             plt.xlim((-max_x*1000,max_x*1000))
             plt.ylim((-max_z*1000,max_z*1000))
@@ -223,11 +235,11 @@ for levitator in lev_list:
         
         if i == "xy":
             fig,ax = plt.subplots(figsize = (500*max_x,402*max_y))
-            cs = ax.contourf(x*1000,y*1000,gorkov[:,:,z0].T,100, vmin = -2e-8, vmax = 2e-8)
+            cs = ax.contourf(x*1000,y*1000,gorkov[:,:,z0].T,100, vmin = -2e-8, vmax = np.amax(gorkov[:,:,z0].T))
             for a in cs.collections:
                 a.set_edgecolor('face')
-            plt.xlabel('X (mm)')
-            plt.ylabel('Y (mm)')
+            plt.xlabel('x (mm)')
+            plt.ylabel('y (mm)')
             plt.axis('equal')
             plt.xlim((-max_x*1000,max_x*1000))
             plt.ylim((-max_y*1000,max_y*1000))
@@ -239,11 +251,12 @@ for levitator in lev_list:
         # ------------------------------------------------
         #### Pressure z axis :
         if i == "z":
+
             plt.figure()
             plt.plot(z*1000,pressure_z)
-            plt.title('Calculated pressure along z axis')
-            plt.xlabel('z (mm)')
-            plt.ylabel('P (Pa)')
+            plt.title('Calculated pressure along x axis')
+            plt.xlabel('x (mm)')
+            plt.ylabel('Pressure (Pa)')
             plt.xlim(-max_z*1000,max_z*1000)
             #plt.ylim(0,1700)
             if savefigure & isz:
@@ -252,12 +265,13 @@ for levitator in lev_list:
 
         # ------------------------------------------------
         #### Pressure y axis :
-        if i == "y":
+        if i == "y":    
+
             plt.figure()
             plt.plot(y*1000,pressure_y)
             plt.title('Calculated Pressure along y axis')
             plt.xlabel('y (mm)')
-            plt.ylabel('P (Pa)')
+            plt.ylabel('Pressure (Pa)')
             plt.xlim(-max_y*1000,max_y*1000)
             if savefigure & isy:
                 plt.savefig(path_save+levitator+"_Pressure_y_"+phase+fig_type, dpi = 300)
@@ -266,11 +280,13 @@ for levitator in lev_list:
         # ------------------------------------------------
         #### Pressure x axis :
         if i == "x":
+
             plt.figure()
-            plt.plot(x*1000,pressure_x)
+            plt.plot(x*1000,pressure_x, label='Less transducers')
             plt.title('Calculated pressure along x axis')
             plt.xlabel('x (mm)')
-            plt.ylabel('P (Pa)')
+            plt.ylabel('Pressure (Pa)')
+            plt.legend(frameon=False)
             plt.xlim(-max_x*1000,max_x*1000)
             if savefigure & isx:
                 plt.savefig(path_save+levitator+"_Pressure_x_"+phase+fig_type, dpi = 300)
