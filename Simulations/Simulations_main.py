@@ -17,7 +17,7 @@ source_coordinates = import_module("coordinates")
 
 # ----------------------------------------
 #### Simulation Parameters :
-lev_list = ["mk3"] #"mk1" or "LangLev"
+lev_list = ["mk1"] #"mk1" or "LangLev"
 phase = "opposition"             # ''opposition''  or ''in_phase'' => To have the central node or a central antinode at (0,0,0), respectively
 
 #### Saving parameters:
