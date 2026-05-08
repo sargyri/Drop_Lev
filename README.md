@@ -1,9 +1,10 @@
 # Drop_Lev
 
-Welcome to the DropLev project. In this depository you can find the data and machine learning algorithm that was develeoped for the prediction of surface tension of acoustically levitated droplets in Ref. [1]
+Welcome to the DropLev project. In this depository you can find the data and machine learning algorithm that was develeoped for the prediction of surface tension of acoustically levitated droplets containing surfactant solutions (see Ref. [1]).
 
+A manuscript has been submitted on the use of this machine learning algorithm for the surface tension determination of acoutsically levitated droplets containing PNIPAM microgels.
 
-The acoustic levitator that was used for the collection of the experimental data is insprired by TinyLev [2]. The design of the levitator used in these studies was model Mk1 from Ref. [3]
+The design of the levitator used in these studies was model Mk1 from Ref. [2], which was inspired by the TinyLev levitator [3]. 
 
 The in-silico data were generated from the theory developed by Marston _et al._ [4-6]. The equation used for the generation of the theoretical contours can be found in Ref. [6].
 
@@ -49,9 +50,9 @@ phi=np.linspace(-np.pi, np.pi, 175)
 
 [1] Argyri, Smaragda-Maria, Lars Evenäs, and Romain Bordes. "Contact-free measurement of surface tension on single droplet using machine learning and acoustic levitation." Journal of Colloid and Interface Science 640 (2023): 637-646.
 
-[2] Marzo, Asier, Adrian Barnes, and Bruce W. Drinkwater. "TinyLev: A multi-emitter single-axis acoustic levitator." Review of Scientific Instruments 88.8 (2017): 085105.
+[2] Argyri, Smaragda-Maria, Carl Andersson, Nicolas Paillet, Lars Evenäs, Jens Ahrens, Asier Marzo, Víctor Contreras, and Romain Bordes. "Customized and high-performing acoustic levitators for contact-free experiments." Journal of Science: Advanced Materials and Devices 9, no. 3 (2024): 100720.
 
-[3] Argyri, Smaragda-Maria, Carl Andersson, Nicolas Paillet, Lars Evenäs, Jens Ahrens, Asier Marzo, Víctor Contreras, and Romain Bordes. "Customized and high-performing acoustic levitators for contact-free experiments." Journal of Science: Advanced Materials and Devices 9, no. 3 (2024): 100720.
+[3] Marzo, Asier, Adrian Barnes, and Bruce W. Drinkwater. "TinyLev: A multi-emitter single-axis acoustic levitator." Review of Scientific Instruments 88.8 (2017): 085105.
 
 [4] P. L. Marston, S. E. Lo Porto Arione, and G. L. Pullen, J. Acoust. Soc. Am. 69, 1499-1501 (1981).
 
